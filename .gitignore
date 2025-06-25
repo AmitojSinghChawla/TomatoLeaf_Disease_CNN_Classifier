@@ -1,0 +1,5 @@
+PlantVillage/
+__pycache__/
+*.pyc
+.vscode/
+*.log
