@@ -1,0 +1,76 @@
+<style>
+        /* Page background and layout */
+        body {
+            background: linear-gradient(135deg, #f8fafc 0%, #e0eafc 100%);
+            min-height: 100vh;
+        }
+
+        /* Styling for Bootstrap cards */
+        .card {
+            border-radius: 1rem;
+            border: none;
+        }
+
+        /* Primary button gradient and hover effect */
+        .btn-primary {
+            background: linear-gradient(90deg, #ff512f 0%, #dd2476 100%);
+            border: none;
+            transition: box-shadow 0.2s;
+        }
+
+        .btn-primary:hover {
+            box-shadow: 0 4px 16px rgba(221,36,118,0.2);
+            background: linear-gradient(90deg, #dd2476 0%, #ff512f 100%);
+        }
+
+        /* Result section styling */
+        .predict-section {
+            background: #fff0f6;
+            border-radius: 1rem;
+            box-shadow: 0 2px 12px rgba(221,36,118,0.08);
+            padding: 2rem 1rem;
+            margin-top: 2rem;
+            animation: fadeIn 0.7s;
+        }
+
+        .predict-section h4 {
+            color: #dd2476;
+            font-weight: bold;
+        }
+
+        .predict-section strong {
+            font-size: 1.5rem;
+            color: #ff512f;
+        }
+
+        /* Disease list hover effect */
+        .list-group-item {
+            border: none;
+            border-radius: 0.5rem !important;
+            margin-bottom: 0.5rem;
+            background: #f8fafc;
+            color: #333;
+            font-weight: 500;
+            transition: background 0.2s;
+        }
+
+        .list-group-item:hover {
+            background: #ffe3ec;
+        }
+
+        /* Responsive padding for mobile */
+        @media (max-width: 576px) {
+            .container {
+                padding: 0 0.5rem;
+            }
+            .card, .predict-section {
+                padding: 1rem 0.5rem;
+            }
+        }
+
+        /* Simple fade-in animation */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>

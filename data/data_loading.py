@@ -1,7 +1,7 @@
 import os
 from torchvision import datasets, transforms
 from torch.utils.data import DataLoader
-import matplotlib.pyplot as plt
+
 
 # === 1. Path to your dataset ===
 # This is the folder that contains subfolders like Tomato___Early_blight, etc.

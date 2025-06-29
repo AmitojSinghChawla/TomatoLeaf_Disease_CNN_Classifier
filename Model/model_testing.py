@@ -59,4 +59,4 @@ if __name__ == "__main__":
 
     # === Evaluate ResNet Model ===
     resnet_model = get_resnet18_model(num_classes)
-    evaluate(resnet_model, model_name="ResNet18", model_path="best_resnet_model.pth")
+    evaluate(resnet_model, model_name="ResNet18", model_path="../app/best_resnet_model.pth")

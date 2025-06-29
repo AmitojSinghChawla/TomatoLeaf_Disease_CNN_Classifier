@@ -1,0 +1,32 @@
+# Ignore unnecessary folders
+Model/
+PlantVillage/
+data
+__pycache__/
+uploads/               # unless you specifically need to retain uploaded images
+.venv/
+.venv*/
+venv/
+env/
+
+# Ignore development, config & logs
+*.ipynb
+*.csv
+*.zip
+*.tar
+*.tar.gz
+*.log
+*.ckpt
+*.pth
+*.pt
+
+# Python cache & junk
+*.pyc
+*.pyo
+*.pyd
+*.DS_Store
+
+# Git-related
+.git/
+.gitignore
+
