@@ -3,7 +3,7 @@
 A deep learning web application to classify tomato leaf diseases from uploaded images using a ResNet18 CNN model. Deployed via Docker on Render.
 
 ## 🚀 Live Demo
-🔗 [Try it Live](https://tomatoleaf-disease-cnn-classifier.onrender.com)
+🔗 [Try it Live]([https://tomatoleaf-disease-cnn-classifier.onrender.com](https://tomatoleaf-disease-cnn-classifier.onrender.com))
 
 Note: First load may take 30–60 seconds due to Render’s free-tier spin-up delay.
 
