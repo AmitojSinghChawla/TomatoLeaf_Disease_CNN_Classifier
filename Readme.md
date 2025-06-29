@@ -102,4 +102,3 @@ B.E. in Data Science & Artificial Intelligence
 
 Passionate about AI, clean code, and efficient deployment pipelines.
 
-udes all the necessary sections and is formatted for clarity and redability. Thank you for your patience, and I apologize for any frustration caused.
