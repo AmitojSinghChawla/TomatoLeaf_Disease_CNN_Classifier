@@ -1,14 +1,15 @@
 import os
-from flask import Flask, request, render_template
+from flask import Flask, request, render_template, url_for
 from werkzeug.utils import secure_filename
 from app.utils import load_model, predict_image
 
 # --- Config ---
-UPLOAD_FOLDER = os.path.join('static', 'uploads')
-os.makedirs(UPLOAD_FOLDER, exist_ok=True)
-
-UPLOAD_FOLDER = 'static/uploads'
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+UPLOAD_FOLDER = os.path.join(BASE_DIR, 'static', 'uploads')
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
+
+# Create upload folder if it doesn't exist
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 # --- Flask App Setup ---
 app = Flask(__name__)
@@ -23,8 +24,8 @@ def allowed_file(filename):
 
 # --- Utility: Clear previous uploaded images ---
 def clear_upload_folder():
-    for filename in os.listdir(UPLOAD_FOLDER):
-        file_path = os.path.join(UPLOAD_FOLDER, filename)
+    for filename in os.listdir(app.config['UPLOAD_FOLDER']):
+        file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
         if os.path.isfile(file_path):
             try:
                 os.remove(file_path)
@@ -50,11 +51,12 @@ def index():
 
             # Predict using model
             prediction = predict_image(filepath, model)
-            image_url = filepath  # Path used in <img src="{{ image_url }}">
+
+            # Generate URL to display image in browser
+            image_url = url_for('static', filename='uploads/' + filename)
 
     return render_template('index.html', prediction=prediction, image=image_url)
 
 # --- Run App ---
 if __name__ == '__main__':
-    # For Docker, avoid debug=True in production
     app.run(debug=False, host='0.0.0.0', port=5000)
