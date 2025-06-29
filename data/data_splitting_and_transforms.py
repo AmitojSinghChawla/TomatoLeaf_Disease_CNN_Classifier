@@ -62,7 +62,7 @@ train_loader = DataLoader(
     dataset=train_ds,       # The training dataset (subset)
     batch_size=32,          # Load 32 samples at a time (like .batch(32) in TensorFlow)
     shuffle=True,           # Randomize data order each epoch (equivalent to .shuffle())
-    num_workers=2,          # Use 2 subprocesses to load data in parallel (like prefetching)
+    num_workers=3,          # Use 2 subprocesses to load data in parallel (like prefetching)
     pin_memory=True         # Speeds up GPU data transfer (no direct TF equivalent but helps performance)
 )
 
@@ -71,7 +71,7 @@ val_loader = DataLoader(
     dataset=val_ds,         # The validation dataset
     batch_size=32,          # Same batch size
     shuffle=False,          # No shuffling — validation should be consistent every run
-    num_workers=2,          # Preload batches in background threads
+    num_workers=3,          # Preload batches in background threads
     pin_memory=True         # Same performance boost if using GPU
 )
 
@@ -80,7 +80,7 @@ test_loader = DataLoader(
     dataset=test_ds,        # The test dataset
     batch_size=32,          # Batch size for inference
     shuffle=False,          # Test data must not be shuffled — ensures consistent accuracy evaluation
-    num_workers=2,          # Background loading
+    num_workers=3,          # Background loading
     pin_memory=True         # Boosts data transfer speed to GPU
 )
 

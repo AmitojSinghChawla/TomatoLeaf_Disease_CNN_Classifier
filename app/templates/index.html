@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Tomato Disease Classifier</title>
+    <!-- Bootstrap 5 CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #f8fafc 0%, #e0eafc 100%);
+            min-height: 100vh;
+        }
+        .card {
+            border-radius: 1rem;
+            border: none;
+        }
+        .btn-primary {
+            background: linear-gradient(90deg, #ff512f 0%, #dd2476 100%);
+            border: none;
+            transition: box-shadow 0.2s;
+        }
+        .btn-primary:hover {
+            box-shadow: 0 4px 16px rgba(221,36,118,0.2);
+            background: linear-gradient(90deg, #dd2476 0%, #ff512f 100%);
+        }
+        .predict-section {
+            background: #fff0f6;
+            border-radius: 1rem;
+            box-shadow: 0 2px 12px rgba(221,36,118,0.08);
+            padding: 2rem 1rem;
+            margin-top: 2rem;
+            animation: fadeIn 0.7s;
+        }
+        .predict-section h4 {
+            color: #dd2476;
+            font-weight: bold;
+        }
+        .predict-section strong {
+            font-size: 1.5rem;
+            color: #ff512f;
+        }
+        .list-group-item {
+            border: none;
+            border-radius: 0.5rem !important;
+            margin-bottom: 0.5rem;
+            background: #f8fafc;
+            color: #333;
+            font-weight: 500;
+            transition: background 0.2s;
+        }
+        .list-group-item:hover {
+            background: #ffe3ec;
+        }
+        @media (max-width: 576px) {
+            .container {
+                padding: 0 0.5rem;
+            }
+            .card, .predict-section {
+                padding: 1rem 0.5rem;
+            }
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-5 mb-4">
+        <h1 class="text-center mb-4" style="color:#dd2476;">🍅 Tomato Disease Classifier</h1>
+
+        <!-- Upload Form -->
+        <form method="POST" enctype="multipart/form-data" class="card p-4 shadow-sm">
+            <div class="mb-3">
+                <label for="image" class="form-label">Upload a tomato leaf image:</label>
+                <input type="file" name="image" accept="image/*" class="form-control" required>
+            </div>
+            <button type="submit" class="btn btn-primary w-100 py-2">Predict Disease</button>
+        </form>
+
+        <!-- Prediction Result -->
+
+        <div class="predict-section text-center mx-auto" style="max-width: 450px;">
+            <h4 class="mb-2">Predicted Disease</h4>
+            <div>
+                <svg width="48" height="48" fill="#ff512f" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z"/></svg>
+            </div>
+            <strong> <strong>{{ prediction if prediction else "No prediction yet." }}</strong>
+</strong>
+        </div>
+
+
+        <!-- Disease Classes -->
+        <div class="mt-5">
+            <h3 class="mb-3" style="color:#ff512f;">Supported Diseases</h3>
+            <div class="row row-cols-1 row-cols-sm-2 row-cols-md-2 row-cols-lg-3 g-4">
+                <!-- Example card, duplicate and edit for each disease -->
+                <div class="col">
+                    <div class="card h-100 shadow-sm border-0" style="background: #ffe3ec;">
+                        <div class="card-img-top d-flex align-items-center justify-content-center" style="height:120px; background:#fff0f6;">
+                            <!-- Add image here later -->
+                            <span style="font-size:2.5rem; color:#dd2476;">🦠</span>
+                        </div>
+                        <div class="card-body">
+                            <h5 class="card-title" style="color:#dd2476;">Early Blight</h5>
+                            <p class="card-text small text-muted">A common fungal disease causing dark spots on leaves and fruit.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="card h-100 shadow-sm border-0" style="background: #e0eafc;">
+                        <div class="card-img-top d-flex align-items-center justify-content-center" style="height:120px; background:#f8fafc;">
+                            <span style="font-size:2.5rem; color:#3a86ff;">🍃</span>
+                        </div>
+                        <div class="card-body">
+                            <h5 class="card-title" style="color:#3a86ff;">Late Blight</h5>
+                            <p class="card-text small text-muted">A serious disease causing brown lesions and rapid leaf decay.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="card h-100 shadow-sm border-0" style="background: #fff0f6;">
+                        <div class="card-img-top d-flex align-items-center justify-content-center" style="height:120px; background:#ffe3ec;">
+                            <span style="font-size:2.5rem; color:#ff512f;">🌱</span>
+                        </div>
+                        <div class="card-body">
+                            <h5 class="card-title" style="color:#ff512f;">Leaf Mold</h5>
+                            <p class="card-text small text-muted">Yellow spots on leaves, often with a fuzzy mold underneath.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="card h-100 shadow-sm border-0" style="background: #e0eafc;">
+                        <div class="card-img-top d-flex align-items-center justify-content-center" style="height:120px; background:#f8fafc;">
+                            <span style="font-size:2.5rem; color:#4361ee;">🍂</span>
+                        </div>
+                        <div class="card-body">
+                            <h5 class="card-title" style="color:#4361ee;">Septoria Leaf Spot</h5>
+                            <p class="card-text small text-muted">Small, circular spots with dark borders on lower leaves.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="card h-100 shadow-sm border-0" style="background: #ffe3ec;">
+                        <div class="card-img-top d-flex align-items-center justify-content-center" style="height:120px; background:#fff0f6;">
+                            <span style="font-size:2.5rem; color:#ff006e;">🧬</span>
+                        </div>
+                        <div class="card-body">
+                            <h5 class="card-title" style="color:#ff006e;">Bacterial Spot</h5>
+                            <p class="card-text small text-muted">Water-soaked spots on leaves and fruit, turning brown and dry.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="card h-100 shadow-sm border-0" style="background: #e0eafc;">
+                        <div class="card-img-top d-flex align-items-center justify-content-center" style="height:120px; background:#f8fafc;">
+                            <span style="font-size:2.5rem; color:#00b4d8;">🦠</span>
+                        </div>
+                        <div class="card-body">
+                            <h5 class="card-title" style="color:#00b4d8;">Bacterial Speck</h5>
+                            <p class="card-text small text-muted">Tiny black specks on leaves, stems, and fruit.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="card h-100 shadow-sm border-0" style="background: #fff0f6;">
+                        <div class="card-img-top d-flex align-items-center justify-content-center" style="height:120px; background:#ffe3ec;">
+                            <span style="font-size:2.5rem; color:#ffbe0b;">🌞</span>
+                        </div>
+                        <div class="card-body">
+                            <h5 class="card-title" style="color:#ffbe0b;">Yellow Leaf Curl Virus</h5>
+                            <p class="card-text small text-muted">Upward curling and yellowing of leaves, stunted growth.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="card h-100 shadow-sm border-0" style="background: #e0eafc;">
+                        <div class="card-img-top d-flex align-items-center justify-content-center" style="height:120px; background:#f8fafc;">
+                            <span style="font-size:2.5rem; color:#8338ec;">🦠</span>
+                        </div>
+                        <div class="card-body">
+                            <h5 class="card-title" style="color:#8338ec;">Mosaic Virus</h5>
+                            <p class="card-text small text-muted">Mottled, light and dark green patterns on leaves.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="card h-100 shadow-sm border-0" style="background: #ffe3ec;">
+                        <div class="card-img-top d-flex align-items-center justify-content-center" style="height:120px; background:#fff0f6;">
+                            <span style="font-size:2.5rem; color:#ff006e;">🍅</span>
+                        </div>
+                        <div class="card-body">
+                            <h5 class="card-title" style="color:#ff006e;">Healthy</h5>
+                            <p class="card-text small text-muted">No disease detected. The tomato plant is healthy.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="card h-100 shadow-sm border-0" style="background: #e0eafc;">
+                        <div class="card-img-top d-flex align-items-center justify-content-center" style="height:120px; background:#f8fafc;">
+                            <span style="font-size:2.5rem; color:#3a86ff;">🌿</span>
+                        </div>
+                        <div class="card-body">
+                            <h5 class="card-title" style="color:#3a86ff;">Target Spot</h5>
+                            <p class="card-text small text-muted">Brown spots with concentric rings, mostly on older leaves.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS (optional) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

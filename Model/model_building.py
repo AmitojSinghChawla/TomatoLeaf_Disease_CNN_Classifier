@@ -7,7 +7,7 @@ import torchvision.transforms as transforms
 import torch.nn.functional as F
 from data.data_loading import dataset
 #We are defining a neural network by creating a class Net that inherits from nn.Module.
-# It includes two convolutional layers with ReLU and max pooling, followed by three fully connected layers.
+# It includes convolutional layers with ReLU and max pooling, followed by three fully connected layers.
 # In the forward method, we pass the input through these layers, flattening it before the dense layers.
 # Finally we create an instance of this model as net.
 
