@@ -102,7 +102,7 @@
             </div>
         </section>
 
-        <!-- Prediction Result Section (Hidden by default) -->
+        <!-- Prediction Result Section -->
         <section class="prediction-section" id="predictionSection" style="display: none;">
             <div class="row justify-content-center">
                 <div class="col-lg-8">
@@ -123,25 +123,25 @@
                             <div class="result-details">
                                 <div class="disease-badge" id="diseaseBadge">
                                     <i class="fas fa-virus me-2"></i>
-                                    <span id="diseaseName">Early Blight</span>
+                                    <span id="diseaseName"></span>
                                 </div>
 
                                 <div class="confidence-section">
                                     <div class="confidence-label">Confidence Score</div>
-                                    <div class="confidence-value" id="confidenceValue">92.4%</div>
+                                    <div class="confidence-value" id="confidenceValue"></div>
                                     <div class="confidence-bar">
-                                        <div class="confidence-fill" id="confidenceFill" style="width: 92.4%"></div>
+                                        <div class="confidence-fill" id="confidenceFill"></div>
                                     </div>
                                 </div>
 
                                 <div class="description-section">
                                     <h5><i class="fas fa-info-circle me-2"></i>Description</h5>
-                                    <p id="diseaseDescription">A common fungal disease causing dark spots with concentric rings on leaves.</p>
+                                    <p id="diseaseDescription"></p>
                                 </div>
 
                                 <div class="treatment-section">
                                     <h5><i class="fas fa-prescription-bottle-alt me-2"></i>Treatment</h5>
-                                    <p id="diseaseTreatment">Apply copper-based fungicide every 7-10 days and remove affected leaves.</p>
+                                    <p id="diseaseTreatment"></p>
                                 </div>
                             </div>
                         </div>
@@ -156,8 +156,9 @@
                 </div>
             </div>
         </section>
+    </div>
 
-        <!-- Disease Information Section -->
+    <!-- Disease Information Section -->
         <section class="diseases-section">
             <div class="text-center mb-5">
                 <h2 class="section-title">
@@ -385,146 +386,97 @@
         </div>
     </footer>
 
-    <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Scripts -->
+   <!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
-    <!-- Custom JavaScript -->
-    <script>
-        // File upload handling
-        const fileInput = document.getElementById('fileInput');
-        const uploadZone = document.getElementById('uploadZone');
-        const imagePreview = document.getElementById('imagePreview');
-        const previewImg = document.getElementById('previewImg');
-        const predictBtn = document.getElementById('predictBtn');
-        const removeBtn = document.getElementById('removeBtn');
-        const uploadForm = document.getElementById('uploadForm');
+<script>
+    const fileInput = document.getElementById('fileInput');
+    const uploadZone = document.getElementById('uploadZone');
+    const imagePreview = document.getElementById('imagePreview');
+    const previewImg = document.getElementById('previewImg');
+    const predictBtn = document.getElementById('predictBtn');
+    const removeBtn = document.getElementById('removeBtn');
 
-        // Drag and drop functionality
-        uploadZone.addEventListener('dragover', (e) => {
-            e.preventDefault();
-            uploadZone.classList.add('drag-over');
-        });
+    // Drag & drop behavior
+    uploadZone.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        uploadZone.classList.add('drag-over');
+    });
 
-        uploadZone.addEventListener('dragleave', () => {
-            uploadZone.classList.remove('drag-over');
-        });
+    uploadZone.addEventListener('dragleave', () => {
+        uploadZone.classList.remove('drag-over');
+    });
 
-        uploadZone.addEventListener('drop', (e) => {
-            e.preventDefault();
-            uploadZone.classList.remove('drag-over');
-            const files = e.dataTransfer.files;
-            if (files.length > 0) {
-                handleFileSelect(files[0]);
-            }
-        });
+    uploadZone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        uploadZone.classList.remove('drag-over');
+        const files = e.dataTransfer.files;
+        if (files.length > 0) handleFileSelect(files[0]);
+    });
 
-        fileInput.addEventListener('change', (e) => {
-            if (e.target.files.length > 0) {
-                handleFileSelect(e.target.files[0]);
-            }
-        });
+    fileInput.addEventListener('change', (e) => {
+        if (e.target.files.length > 0) handleFileSelect(e.target.files[0]);
+    });
 
-        removeBtn.addEventListener('click', () => {
-            resetForm();
-        });
+    removeBtn.addEventListener('click', () => {
+        fileInput.value = '';
+        document.querySelector('.upload-content').style.display = 'block';
+        imagePreview.style.display = 'none';
+        predictBtn.style.display = 'none';
+        document.getElementById('predictionSection').style.display = 'none';
+    });
 
-        function handleFileSelect(file) {
-            if (file && file.type.startsWith('image/')) {
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    previewImg.src = e.target.result;
-                    document.querySelector('.upload-content').style.display = 'none';
-                    imagePreview.style.display = 'block';
-                    predictBtn.style.display = 'inline-flex';
-                };
-                reader.readAsDataURL(file);
-            }
+    function handleFileSelect(file) {
+        if (file && file.type.startsWith('image/')) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                previewImg.src = e.target.result;
+                document.querySelector('.upload-content').style.display = 'none';
+                imagePreview.style.display = 'block';
+                predictBtn.style.display = 'inline-flex';
+            };
+            reader.readAsDataURL(file);
         }
+    }
+function resetForm() {
+    // Reset file input and preview
+    const fileInput = document.getElementById('fileInput');
+    const imagePreview = document.getElementById('imagePreview');
+    const uploadContent = document.querySelector('.upload-content');
+    const predictBtn = document.getElementById('predictBtn');
+    const predictionSection = document.getElementById('predictionSection');
 
-        function resetForm() {
-            fileInput.value = '';
-            document.querySelector('.upload-content').style.display = 'block';
-            imagePreview.style.display = 'none';
-            predictBtn.style.display = 'none';
-            document.getElementById('predictionSection').style.display = 'none';
-        }
+    // Clear file input
+    fileInput.value = '';
 
-        // Form submission with loading state
-        uploadForm.addEventListener('submit', (e) => {
-            e.preventDefault();
+    // Hide prediction section
+    predictionSection.style.display = 'none';
 
-            // Show loading state
-            const btnText = document.querySelector('.btn-text');
-            const btnLoader = document.querySelector('.btn-loader');
-            btnText.style.display = 'none';
-            btnLoader.style.display = 'inline-flex';
-            predictBtn.disabled = true;
+    // Show upload content again
+    uploadContent.style.display = 'block';
 
-            // Simulate API call (replace with actual form submission)
-            setTimeout(() => {
-                showPredictionResult();
-                btnText.style.display = 'inline';
-                btnLoader.style.display = 'none';
-                predictBtn.disabled = false;
-            }, 2500);
-        });
+    // Hide image preview and predict button
+    imagePreview.style.display = 'none';
+    predictBtn.style.display = 'none';
 
-        function showPredictionResult() {
-            // Mock prediction data (replace with actual server response)
-            const mockDiseases = [
-                {
-                    name: 'Early Blight',
-                    confidence: 92.4,
-                    description: 'A common fungal disease causing dark spots with concentric rings on leaves.',
-                    treatment: 'Apply copper-based fungicide every 7-10 days and remove affected leaves.',
-                    severity: 'medium'
-                },
-                {
-                    name: 'Healthy',
-                    confidence: 96.8,
-                    description: 'Your tomato plant is healthy! No signs of disease detected.',
-                    treatment: 'Continue regular care and monitoring for optimal plant health.',
-                    severity: 'low'
-                },
-                {
-                    name: 'Late Blight',
-                    confidence: 89.2,
-                    description: 'Serious fungal disease that can destroy entire crops rapidly.',
-                    treatment: 'Immediate fungicide treatment and remove affected plants.',
-                    severity: 'high'
-                }
-            ];
+    // Optionally, scroll back to top or upload section
+    window.scrollTo({top: 0, behavior: 'smooth'});
+}
+    // Show prediction results from Flask
+    document.addEventListener("DOMContentLoaded", function () {
+        {% if prediction and confidence and image_data %}
+            document.getElementById("resultImg").src = "data:image/jpeg;base64,{{ image_data }}";
+            document.getElementById("diseaseName").textContent = "{{ prediction }}";
+            document.getElementById("confidenceValue").textContent = "{{ confidence }}%";
+            document.getElementById("confidenceFill").style.width = "{{ confidence }}%";
+            document.getElementById("diseaseDescription").textContent = "{{ description }}";
+            document.getElementById("diseaseTreatment").textContent = "{{ treatment }}";
+            document.getElementById("predictionSection").style.display = "block";
+            document.getElementById("predictionSection").scrollIntoView({ behavior: 'smooth' });
+        {% endif %}
+    });
+</script>
 
-            const randomPrediction = mockDiseases[Math.floor(Math.random() * mockDiseases.length)];
-
-            // Update result display
-            document.getElementById('resultImg').src = previewImg.src;
-            document.getElementById('diseaseName').textContent = randomPrediction.name;
-            document.getElementById('confidenceValue').textContent = randomPrediction.confidence + '%';
-            document.getElementById('confidenceFill').style.width = randomPrediction.confidence + '%';
-            document.getElementById('diseaseDescription').textContent = randomPrediction.description;
-            document.getElementById('diseaseTreatment').textContent = randomPrediction.treatment;
-
-            // Update severity styling
-            const diseaseBadge = document.getElementById('diseaseBadge');
-            diseaseBadge.className = `disease-badge severity-${randomPrediction.severity}`;
-
-            // Show result section with animation
-            const predictionSection = document.getElementById('predictionSection');
-            predictionSection.style.display = 'block';
-            predictionSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        }
-
-        // Add hover effects to disease cards
-        document.querySelectorAll('.disease-card').forEach(card => {
-            card.addEventListener('mouseenter', () => {
-                card.style.transform = 'translateY(-10px) scale(1.02)';
-            });
-
-            card.addEventListener('mouseleave', () => {
-                card.style.transform = 'translateY(0) scale(1)';
-            });
-        });
-    </script>
 </body>
 </html>

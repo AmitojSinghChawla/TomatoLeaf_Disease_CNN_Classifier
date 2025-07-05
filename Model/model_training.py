@@ -4,7 +4,7 @@ from data.data_loading import dataset
 from Model.model_building import TomatoCNN  # Make sure this points to your model file
 import torch.nn as nn
 import torch.optim as optim
-from data.data_splitting_and_transforms import train_loader,val_loader
+from data.data_splitting_and_transforms import cnn_train_loader,cnn_val_loader
 def train_model(save_path="best_model.pth", num_epochs=10, batch_size=32, patience=3):
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -48,7 +48,7 @@ def train_model(save_path="best_model.pth", num_epochs=10, batch_size=32, patien
         correct = 0
         total = 0
 
-        for images, labels in train_loader:
+        for images, labels in cnn_train_loader:
             images, labels = images.to(device), labels.to(device)
 
             # Forward pass
@@ -66,7 +66,7 @@ def train_model(save_path="best_model.pth", num_epochs=10, batch_size=32, patien
             correct += (predicted == labels).sum().item()
             running_loss += loss.item()
 
-        epoch_loss = running_loss / len(train_loader)
+        epoch_loss = running_loss / len(cnn_train_loader)
         epoch_accuracy = 100 * correct / total
         train_losses.append(epoch_loss)
 
@@ -79,7 +79,7 @@ def train_model(save_path="best_model.pth", num_epochs=10, batch_size=32, patien
         val_total = 0
 
         with torch.no_grad():
-            for images, labels in val_loader:
+            for images, labels in cnn_val_loader:
                 images, labels = images.to(device), labels.to(device)
                 outputs = model(images)
                 loss = criterion(outputs, labels)
@@ -89,7 +89,7 @@ def train_model(save_path="best_model.pth", num_epochs=10, batch_size=32, patien
                 val_correct += (predicted == labels).sum().item()
                 val_loss += loss.item()
 
-        avg_val_loss = val_loss / len(val_loader)
+        avg_val_loss = val_loss / len(cnn_val_loader)
         avg_val_accuracy = 100 * val_correct / val_total
         val_losses.append(avg_val_loss)
 

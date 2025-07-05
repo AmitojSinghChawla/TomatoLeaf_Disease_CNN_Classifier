@@ -1,8 +1,9 @@
-#__________Spliiting Data into Train,Validation and Test Sets
 import torch
-from data.data_loading import dataset
-from torch.utils.data import random_split
+from torch.utils.data import random_split, DataLoader
+from torchvision import transforms
+from data.data_loading import dataset  # Your original dataset
 
+# ======== 1. Dataset Splitting Function ========
 def get_pytorch_dataset_partitions(dataset, train_split=0.8, val_split=0.1, test_split=0.1, seed=42):
     assert train_split + val_split + test_split == 1, "Splits must sum to 1"
 
@@ -16,74 +17,80 @@ def get_pytorch_dataset_partitions(dataset, train_split=0.8, val_split=0.1, test
     train_ds, val_ds, test_ds = random_split(dataset, [train_size, val_size, test_size], generator=generator)
     return train_ds, val_ds, test_ds
 
-# In PyTorch, many functions that involve randomness (like splitting datasets)
-# use an internal random number generator. By default, this generator produces
-# different results each time you run the script.
+train_ds, val_ds, test_ds = get_pytorch_dataset_partitions(dataset)
 
-# torch.Generator() allows us to create our own random number generator.
-# By calling .manual_seed(42), we set a fixed "starting point" for randomness.
-# This ensures that the train/validation/test split is the same every time the script is run.
+# ======== 2. Transform Definitions ========
 
-# This is important for reproducibility — it helps us compare models,
-# debug consistently, and avoid confusion caused by random variations in data.
-
-train_ds , val_ds , test_ds = get_pytorch_dataset_partitions(dataset)
-
-from torchvision import transforms
-
-# Define a sequence of preprocessing steps using transforms.Compose
-# This is similar to tf.keras.Sequential for image preprocessing in TensorFlow
-
-train_transform = transforms.Compose([
+# === A. For custom CNN (no ImageNet normalization) ===
+cnn_train_transform = transforms.Compose([
     transforms.Resize((256, 256)),
     transforms.RandomHorizontalFlip(),
     transforms.RandomVerticalFlip(),
     transforms.RandomRotation(72),
-    transforms.ToTensor(),  # Always last
+    transforms.ToTensor(),
 ])
 
-# Only resize + convert for validation and test sets
-basic_transform = transforms.Compose([
-    transforms.Resize((256,256)),
-    transforms.ToTensor()
+cnn_basic_transform = transforms.Compose([
+    transforms.Resize((256, 256)),
+    transforms.ToTensor(),
 ])
 
+# === B. For pretrained ResNet (with ImageNet normalization) ===
+effnet_train_transform = transforms.Compose([
+    transforms.Resize((256, 256)),
+    transforms.RandomHorizontalFlip(),
+    transforms.RandomVerticalFlip(),
+    transforms.RandomRotation(72),
+    transforms.ToTensor(),
+    transforms.Normalize(mean=[0.485, 0.456, 0.406],
+                         std=[0.229, 0.224, 0.225]),
+])
 
-# The underlying dataset object is shared, so we set its .transform for each subset
-train_ds.dataset.transform = train_transform   # Augment only training data
-val_ds.dataset.transform = basic_transform     # Clean for validation
-test_ds.dataset.transform = basic_transform    # Clean for testing
+effnet_basic_transform = transforms.Compose([
+    transforms.Resize((256, 256)),
+    transforms.ToTensor(),
+    transforms.Normalize(mean=[0.485, 0.456, 0.406],
+                         std=[0.229, 0.224, 0.225]),
+])
 
+# ======== 3. Apply transforms to duplicated datasets ========
 
-from torch.utils.data import DataLoader
+# Clone datasets so both models can use their own version
+from copy import deepcopy
+cnn_train_ds = deepcopy(train_ds)
+cnn_val_ds   = deepcopy(val_ds)
+cnn_test_ds  = deepcopy(test_ds)
 
-# === Train DataLoader ===
-train_loader = DataLoader(
-    dataset=train_ds,       # The training dataset (subset)
-    batch_size=32,          # Load 32 samples at a time (like .batch(32) in TensorFlow)
-    shuffle=True,           # Randomize data order each epoch (equivalent to .shuffle())
-    num_workers=3,          # Use 2 subprocesses to load data in parallel (like prefetching)
-    pin_memory=True         # Speeds up GPU data transfer (no direct TF equivalent but helps performance)
-)
+effnet_train_ds = deepcopy(train_ds)
+effnet_val_ds   = deepcopy(val_ds)
+effnet_test_ds  = deepcopy(test_ds)
 
-# === Validation DataLoader ===
-val_loader = DataLoader(
-    dataset=val_ds,         # The validation dataset
-    batch_size=32,          # Same batch size
-    shuffle=False,          # No shuffling — validation should be consistent every run
-    num_workers=3,          # Preload batches in background threads
-    pin_memory=True         # Same performance boost if using GPU
-)
+# Apply transforms
+cnn_train_ds.dataset.transform    = cnn_train_transform
+cnn_val_ds.dataset.transform      = cnn_basic_transform
+cnn_test_ds.dataset.transform     = cnn_basic_transform
 
-# === Test DataLoader ===
-test_loader = DataLoader(
-    dataset=test_ds,        # The test dataset
-    batch_size=32,          # Batch size for inference
-    shuffle=False,          # Test data must not be shuffled — ensures consistent accuracy evaluation
-    num_workers=3,          # Background loading
-    pin_memory=True         # Boosts data transfer speed to GPU
-)
+effnet_train_ds.dataset.transform = effnet_train_transform
+effnet_val_ds.dataset.transform   = effnet_basic_transform
+effnet_test_ds.dataset.transform  = effnet_basic_transform
 
-# print(f"Total samples: {len(dataset)}")
-# print(f"Train: {len(train_ds)} | Val: {len(val_ds)} | Test: {len(test_ds)}")
-# print(f"Classes: {dataset.classes}")
+# ======== 4. Dataloaders ========
+
+def create_loader(ds):
+    return DataLoader(
+        dataset=ds,
+        batch_size=32,
+        shuffle=isinstance(ds, torch.utils.data.Subset) and ds == cnn_train_ds or ds == effnet_train_ds,
+        num_workers=3,
+        pin_memory=True
+    )
+
+# Custom CNN loaders
+cnn_train_loader = create_loader(cnn_train_ds)
+cnn_val_loader   = create_loader(cnn_val_ds)
+cnn_test_loader  = create_loader(cnn_test_ds)
+
+# ResNet loaders
+effnet_train_loader = create_loader(effnet_train_ds)
+effnet_val_loader   = create_loader(effnet_val_ds)
+effnet_test_loader  = create_loader(effnet_test_ds)

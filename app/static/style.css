@@ -603,7 +603,6 @@ body {
 
 .severity-high {
     background: rgba(255, 107, 107, 0.2);
-    color: #ff6b6b;
     border: 1px solid rgba(255, 107, 107, 0.3);
 }
 
@@ -751,28 +750,28 @@ body {
     .hero-title {
         font-size: 2.5rem;
     }
-    
+
     .section-title {
         font-size: 2rem;
     }
-    
+
     .glass-card {
         padding: 1.5rem;
     }
-    
+
     .upload-zone {
         padding: 2rem 1rem;
     }
-    
+
     .result-content {
         grid-template-columns: 1fr;
         gap: 1.5rem;
     }
-    
+
     .disease-card {
         padding: 1.5rem;
     }
-    
+
     .floating-shape {
         display: none;
     }
@@ -782,28 +781,28 @@ body {
     .hero-title {
         font-size: 2rem;
     }
-    
+
     .hero-subtitle {
         font-size: 1rem;
     }
-    
+
     .section-title {
         font-size: 1.75rem;
     }
-    
+
     .glass-card {
         padding: 1rem;
     }
-    
+
     .upload-zone {
         padding: 1.5rem 1rem;
         min-height: 250px;
     }
-    
+
     .upload-title {
         font-size: 1.25rem;
     }
-    
+
     .footer-badges {
         flex-direction: column;
         align-items: center;

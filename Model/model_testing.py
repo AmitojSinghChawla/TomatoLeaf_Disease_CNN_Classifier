@@ -2,7 +2,9 @@ import torch
 from sklearn.metrics import accuracy_score, confusion_matrix
 import matplotlib.pyplot as plt
 import seaborn as sns
-from data.data_splitting_and_transforms import test_loader
+from torchvision.models import efficientnet_b0
+
+from data.data_splitting_and_transforms import effnet_test_loader,cnn_test_loader
 from data.data_loading import dataset
 from Model.model_training import TomatoCNN  # CNN model
 from torchvision import models
@@ -10,17 +12,21 @@ import torch.nn as nn
 import numpy as np
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-class_names = dataset.classes
+with open("../app/class_names.txt") as f:
+    class_names = [line.strip() for line in f]
+
 num_classes = len(class_names)
 
-# === ResNet18 Loader ===
-def get_resnet18_model(num_classes):
-    model = models.resnet18(pretrained=False)
-    model.fc = nn.Linear(model.fc.in_features, num_classes)
+# === EfficientNet-B0 Loader ===
+def get_effnet_model(num_classes):
+    model = efficientnet_b0(pretrained=False)
+    in_features = model.classifier[1].in_features
+    model.classifier[1] = nn.Linear(in_features, num_classes)
     return model
 
+
 # === Evaluation Function (shared) ===
-def evaluate(model, model_name, model_path):
+def evaluate(model, model_name, model_path,test_loader):
     model.load_state_dict(torch.load(model_path, map_location=device))
     model.to(device)
     model.eval()
@@ -55,8 +61,8 @@ def evaluate(model, model_name, model_path):
 if __name__ == "__main__":
     # === Evaluate CNN Model ===
     cnn_model = TomatoCNN(num_classes=num_classes)
-    evaluate(cnn_model, model_name="Custom CNN", model_path="best_model.pth")
+    evaluate(cnn_model, model_name="Custom CNN", model_path="best_model.pth",test_loader=cnn_test_loader)
 
-    # === Evaluate ResNet Model ===
-    resnet_model = get_resnet18_model(num_classes)
-    evaluate(resnet_model, model_name="ResNet18", model_path="../app/best_resnet_model.pth")
+    # === Evaluate Effnet Model ===
+    effnet = get_effnet_model(num_classes)
+    evaluate(effnet, model_name="Effnet", model_path="../app/best_effnet_model.pth", test_loader=effnet_test_loader)
