@@ -10,9 +10,11 @@ torch.manual_seed(42)
 torch.backends.cudnn.deterministic = True
 torch.backends.cudnn.benchmark = False
 
-with open("class_names.txt") as f:
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+with open(os.path.join(BASE_DIR, "class_names.txt")) as f:
     class_names = [line.strip() for line in f]
-num_classes = len(class_names)
+
+num_classes=len(class_names)
 
 transform = transforms.Compose([
     transforms.Resize((256, 256)),

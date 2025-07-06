@@ -4,14 +4,14 @@ FROM python:3.9-slim
 # Set working directory inside container
 WORKDIR /app
 
-# Copy everything from your project to container
+# Copy all project files into the container
 COPY . .
 
 # Install dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Expose Flask's default port
-EXPOSE 5000
+# Expose the port used by Gunicorn
+EXPOSE 8000
 
-# Start the Flask app
-CMD ["python", "-m", "app.main"]
+# Start the app using Gunicorn
+CMD ["gunicorn", "-w", "4", "-b", "0.0.0.0:8000", "app.main:app"]
