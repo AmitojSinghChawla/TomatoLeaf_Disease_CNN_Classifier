@@ -11,7 +11,7 @@ COPY . .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Expose the port used by Gunicorn
-EXPOSE 8000
+EXPOSE 5000
 
-# Start the app using Gunicorn
-CMD ["gunicorn", "-w", "4", "-b", "0.0.0.0:8000", "app.main:app"]
+# Start the app using Gunicorn with a single worker to reduce memory usage
+CMD ["gunicorn", "-w", "1", "-b", "0.0.0.0:5000", "app.main:app"]
