@@ -23,6 +23,8 @@ transform = transforms.Compose([
                          std=[0.229, 0.224, 0.225])
 ])
 
+import torch.quantization  # Add this
+
 def load_model(num_classes):
     model_path = os.path.join(os.path.dirname(__file__), "best_effnet_model.pth")
     if not os.path.exists(model_path):
@@ -31,9 +33,15 @@ def load_model(num_classes):
     model = efficientnet_b0(pretrained=False)
     in_features = model.classifier[1].in_features
     model.classifier[1] = nn.Linear(in_features, num_classes)
+
     model.load_state_dict(torch.load(model_path, map_location=torch.device("cpu")))
+
+    # ✅ Quantize only Linear layers to reduce memory usage
+    model = torch.quantization.quantize_dynamic(model, {nn.Linear}, dtype=torch.qint8)
+
     model.eval()
     return model
+
 
 def predict_image(image_input, model):
     image = transform(image_input).unsqueeze(0)
