@@ -1,51 +1,57 @@
-import torch
-import torchvision.transforms as transforms
-from PIL import Image
-import os
-from torch import nn
-from torchvision.models import efficientnet_b0
+# === Import core libraries ===
+import torch                                    # PyTorch for model and tensor operations
+import torchvision.transforms as transforms    # For preprocessing images
+from PIL import Image                          # To open and manipulate images
+import os                                      # To handle file paths
+from torch import nn                           # For defining neural network layers
+from torchvision.models import efficientnet_b0 # Load EfficientNet-B0 architecture
 
-# Deterministic
+# === Set deterministic behavior for reproducibility ===
 torch.manual_seed(42)
 torch.backends.cudnn.deterministic = True
 torch.backends.cudnn.benchmark = False
 
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-with open(os.path.join(BASE_DIR, "class_names.txt")) as f:
-    class_names = [line.strip() for line in f]
+# === Load class names from text file ===
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))        # Directory where this script lives
+with open(os.path.join(BASE_DIR, "class_names.txt")) as f:   # Read class names line-by-line
+    class_names = [line.strip() for line in f]               # Strip newline characters
 
-num_classes=len(class_names)
+num_classes = len(class_names)  # Total number of output classes for the model
 
+# === Define image preprocessing pipeline ===
 transform = transforms.Compose([
-    transforms.Resize((256, 256)),
-    transforms.ToTensor(),
-    transforms.Normalize(mean=[0.485, 0.456, 0.406],
+    transforms.Resize((256, 256)),                            # Resize to 256x256
+    transforms.ToTensor(),                                    # Convert to PyTorch tensor
+    transforms.Normalize(mean=[0.485, 0.456, 0.406],          # Normalize using ImageNet stats
                          std=[0.229, 0.224, 0.225])
 ])
 
-import torch.quantization  # Add this
+# === Import PyTorch quantization module ===
+import torch.quantization  # Enables dynamic quantization to reduce model size for inference
 
+# === Load model architecture and weights ===
 def load_model(num_classes):
-    model_path = os.path.join(os.path.dirname(__file__), "best_effnet_model.pth")
-    if not os.path.exists(model_path):
+    model_path = os.path.join(os.path.dirname(__file__), "best_effnet_model.pth")  # Model file path
+    if not os.path.exists(model_path):                                             # Safety check
         raise FileNotFoundError(f"Model not found at {model_path}")
 
-    model = efficientnet_b0(pretrained=False)
-    in_features = model.classifier[1].in_features
-    model.classifier[1] = nn.Linear(in_features, num_classes)
+    model = efficientnet_b0(pretrained=False)                    # Load architecture without pretrained weights
+    in_features = model.classifier[1].in_features                # Input size of final FC layer
+    model.classifier[1] = nn.Linear(in_features, num_classes)   # Replace FC layer with one for your num_classes
 
-    model.load_state_dict(torch.load(model_path, map_location=torch.device("cpu")))
+    model.load_state_dict(torch.load(model_path, map_location=torch.device("cpu")))  # Load trained weights
 
-    # ✅ Quantize only Linear layers to reduce memory usage
+    # ✅ Dynamically quantize only the linear layers for memory efficiency
     model = torch.quantization.quantize_dynamic(model, {nn.Linear}, dtype=torch.qint8)
 
-    model.eval()
-    return model
+    model.eval()     # Set model to evaluation mode
+    return model     # Return the ready-to-use model
 
-
+# === Predict disease from image input ===
 def predict_image(image_input, model):
-    image = transform(image_input).unsqueeze(0)
+    image = transform(image_input).unsqueeze(0)  # Apply preprocessing and add batch dimension
 
+    # === Dictionary with disease metadata ===
     disease_metadata = {
         "Bacterial Spot": {
             "description": "Dark spots with yellow halos, affecting leaves, stems, and fruit.",
@@ -89,7 +95,7 @@ def predict_image(image_input, model):
         }
     }
 
-    # Map your exact class names to clean names
+    # === Mapping internal class labels to clean disease names ===
     class_name_map = {
         "Tomato_Bacterial_spot": "Bacterial Spot",
         "Tomato_Early_blight": "Early Blight",
@@ -103,20 +109,22 @@ def predict_image(image_input, model):
         "Tomato_healthy": "Healthy",
     }
 
-    with torch.no_grad():
-        outputs = model(image)
-        probs = torch.nn.functional.softmax(outputs, dim=1)
-        _, predicted = torch.max(probs, 1)
-        predicted_idx = predicted.item()
-        confidence = probs[0][predicted_idx].item()
+    with torch.no_grad():                      # Disable gradient computation for inference
+        outputs = model(image)                 # Get model predictions (logits)
+        probs = torch.nn.functional.softmax(outputs, dim=1)  # Convert logits to probabilities
+        _, predicted = torch.max(probs, 1)     # Get class index with highest probability
+        predicted_idx = predicted.item()       # Convert tensor to int
+        confidence = probs[0][predicted_idx].item()  # Get confidence score of predicted class
 
-        raw_class_name = class_names[predicted_idx]
+        raw_class_name = class_names[predicted_idx]   # Look up class name from index
 
-        # Map to clean disease name
+        # Get clean name from internal class name
         disease_name = class_name_map.get(raw_class_name, "Unknown")
 
+        # Get metadata (description & treatment) for the disease
         metadata = disease_metadata.get(disease_name, {"description": "N/A", "treatment": "N/A"})
 
+        # Return a dictionary of prediction results
         return {
             "class": disease_name,
             "confidence": round(confidence * 100, 2),

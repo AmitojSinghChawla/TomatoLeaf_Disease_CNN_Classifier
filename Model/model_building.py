@@ -1,4 +1,3 @@
-
 import torch
 import torch.nn as nn
 import torch.optim as optim
@@ -6,17 +5,19 @@ import torchvision
 import torchvision.transforms as transforms
 import torch.nn.functional as F
 from data.data_loading import dataset
-#We are defining a neural network by creating a class Net that inherits from nn.Module.
+
+# We are defining a neural network by creating a class Net that inherits from nn.Module.
 # It includes convolutional layers with ReLU and max pooling, followed by three fully connected layers.
 # In the forward method, we pass the input through these layers, flattening it before the dense layers.
 # Finally we create an instance of this model as net.
 
-import torch.nn as nn
-import torch.nn.functional as F
+import torch.nn as nn  # Redundant re-import, but harmless
+import torch.nn.functional as F  # Redundant re-import, also harmless
 
-from data.data_loading import dataset
+from data.data_loading import dataset  # Redundant re-import, but won't break anything
 
-num_classes=len(dataset.classes)
+num_classes = len(dataset.classes)  # Automatically fetch the number of target classes in the dataset
+
 # Define a Convolutional Neural Network class
 class TomatoCNN(nn.Module):
     def __init__(self, num_classes):
@@ -83,10 +84,10 @@ class TomatoCNN(nn.Module):
         return self.fc2(x)
 
 
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")  # Automatically use GPU if available
 
 model = TomatoCNN(num_classes=num_classes)  # Change if your dataset has different #classes
-model = model.to(device)
+model = model.to(device)  # Move model to GPU/CPU
 
 # === LOSS FUNCTION ===
 # For multi-class classification. Accepts raw logits + integer class labels.
