@@ -1,3 +1,4 @@
-# tests/test_dummy.py
-def test_dummy():
-    assert 2 + 2 == 4
+# tests/test.py
+
+def test_placeholder():
+    assert True  # Always passes
